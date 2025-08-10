@@ -4,23 +4,63 @@ No need for an Android emulator to decrypt ALAC files. All files from anonymous.
 
 ### Recommended Environment
 #### Only support Linux x86_64 and arm64.
-For best results, it's recommended to use **Windows Subsystem for Linux (WSL)**.
+For best results, it's recommended to use **Windows Subsystem for Linux (WSL)**
 
 # Special thanks
 - Anonymous, for providing the original version of this project and the legacy Frida decryption method.
 - chocomint, for providing support for arm64 arch.
 
 ---
-### Version 2 Docker
+### Version 2 Docker (Recommended for Windows Users)
+
 Available for x86_64 and arm64. Need to download prebuilt version from releases or actions.
 
+Folked from zhaahey. Modified by me to be able to use Docker Desktop.
+
+#### Using Docker Desktop: 
+
+1. **Build the Docker image:**
+```bash
+docker build --tag wrapper .
+```
+
+2. **Create required directory structure:**
+```bash
+mkdir -p data/data/com.apple.android.music/files
+```
+
+3. **Login to Apple Music:**
+```bash
+docker run -d --name wrapper-login -p 10020:10020 -p 20020:20020 -v ${PWD}/data:/data -e args="-L username:password -F -H 0.0.0.0" wrapper
+```
+
+4. **Run the wrapper service:**
+```bash
+docker run -d --name wrapper-service -p 10020:10020 -p 20020:20020 -v ${PWD}/data:/data -e args="-H 0.0.0.0" wrapper
+```
+
+5. **Check if container is running:**
+```bash
+docker ps
+```
+
+6. **View logs:**
+```bash
+docker logs wrapper-service
+```
+
+7. **Stop the service:**
+```bash
+docker stop wrapper-service
+docker rm wrapper-service
+```
+
+#### Alternative Docker Commands (Original):
 Build image: `docker build --tag wrapper .`
 
 Login: `docker run -v ./rootfs/data:/app/rootfs/data -p 10020:10020 -e args="-L username:password -F -H 0.0.0.0" wrapper`
 
 Run: `docker run -v ./rootfs/data:/app/rootfs/data -p 10020:10020 -e args="-H 0.0.0.0" wrapper`
-
-
 
 ### Version 2
 
@@ -33,7 +73,7 @@ Run: `docker run -v ./rootfs/data:/app/rootfs/data -p 10020:10020 -e args="-H 0.
   -D, --decrypt-port=INT   (default: `10020`)
   -M, --m3u8-port=INT      (default: `20020`)
   -P, --proxy=STRING       (default: `''`)
-  -L, --login=STRING       ([username]:[password])
+  -L, --login=STRING       ([username] [password])
 ```
 #### Installation x86_64：
 ```shell
