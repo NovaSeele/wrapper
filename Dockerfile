@@ -1,8 +1,16 @@
 FROM ubuntu:latest
 
 WORKDIR /app
-#COPY --from=builder /app /app
-COPY . /app
+
+# Copy the prebuilt wrapper binary
+COPY wrapper /app/wrapper
+
+# Copy the rootfs directory
+COPY rootfs /app/rootfs
+
+# Make it executable
+RUN chmod +x /app/wrapper
+
 ENV args ""
 
 CMD ["bash", "-c", "./wrapper ${args}"]
